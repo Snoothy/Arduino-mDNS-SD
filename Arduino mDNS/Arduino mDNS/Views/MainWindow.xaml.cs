@@ -12,6 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Arduino_mDNS.Managers;
+using Arduino_mDNS.ViewModels;
 
 namespace Arduino_mDNS
 {
@@ -20,9 +22,22 @@ namespace Arduino_mDNS
     /// </summary>
     public partial class MainWindow : Window
     {
+        private MainWindowViewModel _viewModel;
+
+        public DiscoveryManager DiscoveryManager { get; set; }
+
         public MainWindow()
         {
+            _viewModel = new MainWindowViewModel();
+            DataContext = _viewModel;
+            DiscoveryManager = new DiscoveryManager();
+            
             InitializeComponent();
+        }
+
+        private void Scan_OnClick(object sender, RoutedEventArgs e)
+        {
+            
         }
     }
 }
