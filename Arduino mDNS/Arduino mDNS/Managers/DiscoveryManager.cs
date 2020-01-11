@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using Tmds.MDns;
 
@@ -11,14 +12,14 @@ namespace Arduino_mDNS.Managers
 
         public DiscoveryManager()
         {
-            var serviceType = "_workstation._tcp";
+            var serviceType = "_ucr._udp";
 
             _serviceBrowser = new ServiceBrowser();
             _serviceBrowser.ServiceAdded += OnServiceAdded;
             _serviceBrowser.ServiceRemoved += OnServiceRemoved;
             _serviceBrowser.ServiceChanged += OnServiceChanged;
 
-            Console.WriteLine("Browsing for type: {0}", serviceType);
+            Debug.WriteLine($"Browsing for type: {serviceType}");
             _serviceBrowser.StartBrowse(serviceType);
         }
 
@@ -39,10 +40,10 @@ namespace Arduino_mDNS.Managers
 
         private static void printService(char startChar, ServiceAnnouncement service)
         {
-            Console.WriteLine("{0} '{1}' on {2}", startChar, service.Instance, service.NetworkInterface.Name);
-            Console.WriteLine("\tHost: {0} ({1})", service.Hostname, string.Join(", ", service.Addresses));
-            Console.WriteLine("\tPort: {0}", service.Port);
-            Console.WriteLine("\tTxt : [{0}]", string.Join(", ", service.Txt));
+            Debug.WriteLine($"{startChar} '{service.Instance}' on {service.NetworkInterface.Name}");
+            Debug.WriteLine($"\tHost: {service.Hostname} ({string.Join(", ", service.Addresses)})");
+            Debug.WriteLine($"\tPort: {service.Port}");
+            Debug.WriteLine($"\tTxt : [{string.Join(", ", service.Txt)}]");
         }
     }
 }
