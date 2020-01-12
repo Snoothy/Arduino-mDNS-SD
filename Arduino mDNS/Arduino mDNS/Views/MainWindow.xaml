@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Arduino_mDNS"
         mc:Ignorable="d"
-        Title="Arduino mDNS-SD" Height="480" Width="600">
+        Title="Arduino mDNS-SD" Height="480" Width="800">
     <Grid Margin="8">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -18,7 +18,20 @@
         </Grid.RowDefinitions>
         <TextBlock Text="Actions" Style="{StaticResource MaterialDesignHeadline6TextBlock}" />
         <StackPanel Margin="0 8" Grid.Row="1" Grid.Column="0">
-            <Button Content="Scan" Click="Scan_OnClick"/> 
+            <Button Content="Send UDP packet" Click="Send_OnClick"/> 
         </StackPanel>
+        <TextBlock Text="Agents" Style="{StaticResource MaterialDesignHeadline6TextBlock}" Grid.Row="0" Grid.Column="1" Margin="8 0"/>
+        <ListView x:Name="AgentList" ItemsSource="{Binding Agents}" Grid.Row="1" Grid.Column="1" Margin="8">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel>
+                        <TextBlock Text="{Binding FullName}"  />
+                    </StackPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+
+        <TextBlock Text="Response" Style="{StaticResource MaterialDesignHeadline6TextBlock}" Grid.Row="0" Grid.Column="2" Margin="8 0"/>
+        <TextBlock x:Name="ReponseText" Grid.Row="1" Grid.Column="2" Margin="8" Style="{StaticResource MaterialDesignBody1TextBlock}"/>
     </Grid>
 </Window>

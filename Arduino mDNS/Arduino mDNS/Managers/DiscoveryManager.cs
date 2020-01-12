@@ -2,16 +2,23 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
+using Arduino_mDNS.Models;
 using Tmds.MDns;
 
 namespace Arduino_mDNS.Managers
 {
     public class DiscoveryManager
     {
-        private ServiceBrowser _serviceBrowser;
+        public List<ServiceAgent> ServiceAgents { get; set; }
 
-        public DiscoveryManager()
+        private ServiceBrowser _serviceBrowser;
+        public delegate void AgentAdded(ServiceAgent serviceAgent); 
+        public event AgentAdded AgentAddedEvent;
+
+
+        public DiscoveryManager(AgentAdded agentAdded)
         {
+            ServiceAgents = new List<ServiceAgent>();
             var serviceType = "_ucr._udp";
 
             _serviceBrowser = new ServiceBrowser();
@@ -21,6 +28,8 @@ namespace Arduino_mDNS.Managers
 
             Debug.WriteLine($"Browsing for type: {serviceType}");
             _serviceBrowser.StartBrowse(serviceType);
+
+            AgentAddedEvent += agentAdded;
         }
 
         private void OnServiceChanged(object sender, ServiceAnnouncementEventArgs e)
@@ -35,6 +44,14 @@ namespace Arduino_mDNS.Managers
 
         private void OnServiceAdded(object sender, ServiceAnnouncementEventArgs e)
         {
+            var serviceAgent = new ServiceAgent()
+            {
+                Hostname = e.Announcement.Hostname,
+                Ip = e.Announcement.Addresses[0],
+                Port = e.Announcement.Port
+            };
+            ServiceAgents.Add(serviceAgent);
+            AgentAddedEvent?.Invoke(serviceAgent);
             printService('+', e.Announcement);
         }
 

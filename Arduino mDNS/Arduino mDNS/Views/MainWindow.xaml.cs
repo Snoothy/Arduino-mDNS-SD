@@ -13,7 +13,9 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Arduino_mDNS.Managers;
+using Arduino_mDNS.Models;
 using Arduino_mDNS.ViewModels;
+using Tmds.MDns;
 
 namespace Arduino_mDNS
 {
@@ -25,19 +27,36 @@ namespace Arduino_mDNS
         private MainWindowViewModel _viewModel;
 
         public DiscoveryManager DiscoveryManager { get; set; }
+        public UdpManager UdpManager { get; set; }
 
         public MainWindow()
         {
-            _viewModel = new MainWindowViewModel();
+            DiscoveryManager = new DiscoveryManager(OnAgentAdded);
+            UdpManager = new UdpManager();
+
+            _viewModel = new MainWindowViewModel(DiscoveryManager);
             DataContext = _viewModel;
-            DiscoveryManager = new DiscoveryManager();
             
             InitializeComponent();
         }
 
-        private void Scan_OnClick(object sender, RoutedEventArgs e)
+        private void OnAgentAdded(ServiceAgent serviceagent)
         {
-            
+            _viewModel.AddAgent(serviceagent);
+            ReponseText.Text = "Send response to get started";
+        }
+
+        private void Send_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (SelectedAgent() == null) return;
+
+            UdpManager.SendUdpPacket(SelectedAgent());
+        }
+
+
+        private ServiceAgent SelectedAgent()
+        {
+            return (ServiceAgent) AgentList.SelectedItem;
         }
     }
 }
