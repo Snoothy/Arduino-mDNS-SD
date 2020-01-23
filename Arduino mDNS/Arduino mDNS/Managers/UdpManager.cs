@@ -15,7 +15,8 @@ namespace Arduino_mDNS.Managers
 
         public void SendUdpPacket(ServiceAgent serviceAgent)
         {
-            var udpClient = new UdpClient(serviceAgent.Port);
+            // Bind specific local port
+            using var udpClient = new UdpClient(8090);
 
             udpClient.Connect(serviceAgent.Ip, serviceAgent.Port);
 
