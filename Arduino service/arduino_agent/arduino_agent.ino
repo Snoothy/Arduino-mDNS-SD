@@ -24,18 +24,20 @@ void setup() {
   Serial.println("\r\nsetup()");
   
   ucr.name("UCR-ExampleAgent");
+  //ucr.addButton("Horn", 0);
+
   ucr.begin();
 }
 
 void loop() {
   ucr.update();
 
-  if(millis() - ucr.lastUpdateMillis() <= deadmanTimeout){
+  if(millis() - ucr.lastUpdateMillis() <= deadmanTimeout) {
     deadmanTriggered = 0;
     Serial.print(".");
     delay(10);
-  }else{
-    if(!deadmanTriggered){
+  } else {
+    if (!deadmanTriggered) {
       Serial.print(" Dead :-(");
       deadmanTriggered = 1;
     }

@@ -43,20 +43,24 @@ namespace Arduino_mDNS
         private void OnAgentAdded(ServiceAgent serviceagent)
         {
             _viewModel.AddAgent(serviceagent);
-            ReponseText.Text = "Send response to get started";
         }
 
         private void Send_OnClick(object sender, RoutedEventArgs e)
         {
             if (SelectedAgent() == null) return;
 
-            UdpManager.SendUdpPacket(SelectedAgent());
+            _viewModel.SetResponse(UdpManager.SendUdpPacket(SelectedAgent()));
         }
 
 
         private ServiceAgent SelectedAgent()
         {
             return (ServiceAgent) AgentList.SelectedItem;
+        }
+
+        private void Clear_OnClick(object sender, RoutedEventArgs e)
+        {
+            _viewModel.ClearAgentList();
         }
     }
 }

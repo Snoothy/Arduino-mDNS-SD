@@ -4,6 +4,8 @@
 
 #include <WiFiUdp.h>
 
+#define BUTTON_COUNT 32
+
 class UCR {
 
     public:
@@ -12,6 +14,18 @@ class UCR {
         void begin();
         void update();
         void name(const char* name);
+
+        void addButton(const char* name, int index);
+        
+        void addAxis(const char* name, int index);
+        void addDelta(const char* name, int index);
+        void addEvent(const char* name, int index);
+
+        short readButton(int index);
+        short readAxis(int index);
+        short readDelta(int index);
+        short readEvent(int index);
+        
         unsigned long lastUpdateMillis();
     private:
         void setupWiFi();
@@ -26,6 +40,9 @@ class UCR {
         const char* _password;
         unsigned int _port;
         unsigned long _lastUpdateMillis;
+
+        const char** _buttonList[BUTTON_COUNT] = {0};
+        int _buttons = -1;
 
         char incomingPacketBuffer[255]; 
 };

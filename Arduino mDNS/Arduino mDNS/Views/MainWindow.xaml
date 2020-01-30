@@ -18,7 +18,8 @@
         </Grid.RowDefinitions>
         <TextBlock Text="Actions" Style="{StaticResource MaterialDesignHeadline6TextBlock}" />
         <StackPanel Margin="0 8" Grid.Row="1" Grid.Column="0">
-            <Button Content="Send UDP packet" Click="Send_OnClick"/> 
+            <Button Content="Clear Agents" Click="Clear_OnClick" Margin="4"/>
+            <Button Content="Send UDP packet" Click="Send_OnClick" Margin="4"/>
         </StackPanel>
         <TextBlock Text="Agents" Style="{StaticResource MaterialDesignHeadline6TextBlock}" Grid.Row="0" Grid.Column="1" Margin="8 0"/>
         <ListView x:Name="AgentList" ItemsSource="{Binding Agents}" Grid.Row="1" Grid.Column="1" Margin="8">
@@ -32,6 +33,6 @@
         </ListView>
 
         <TextBlock Text="Response" Style="{StaticResource MaterialDesignHeadline6TextBlock}" Grid.Row="0" Grid.Column="2" Margin="8 0"/>
-        <TextBlock x:Name="ReponseText" Grid.Row="1" Grid.Column="2" Margin="8" Style="{StaticResource MaterialDesignBody1TextBlock}"/>
+        <TextBlock x:Name="ReponseText" Text="{Binding Response}" Grid.Row="1" Grid.Column="2" Margin="8" Style="{StaticResource MaterialDesignBody1TextBlock}"/>
     </Grid>
 </Window>

@@ -1,6 +1,6 @@
 # Arduino mDNS-SD
 
-Proof of concept for Arduino service discovery using custom ASN.1 protocols.
+Proof of concept for Arduino service discovery using custom Messagepack protocols.
 
 
 

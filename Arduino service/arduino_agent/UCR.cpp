@@ -2,9 +2,11 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
 #include <WiFiUdp.h>
+//#include <ArduinoJson.h>
 
-#define MSG_DESCRIPTOR 0
-#define MSG_DATA 1
+#define MSG_HEARTBEAT 0
+#define MSG_DESCRIPTOR 1
+#define MSG_DATA 2
 
 
 char packetBuffer[UDP_TX_PACKET_MAX_SIZE]; //buffer to hold incoming packet,
@@ -70,6 +72,10 @@ void UCR::setupMDNS(){
 
 void UCR::name(const char* name) {
     strncpy(_name, name, (sizeof(_name)-1));
+}
+
+void UCR::addButton(const char* name, int index){
+    *_buttonList[index] = name;
 }
 
 void UCR::update(){
