@@ -4,12 +4,14 @@
 #include <WiFiUdp.h>
 #include <ArduinoJson.h>
 
+#define BUTTONS "Buttons"
+#define AXES "Axes"
+#define DELTAS "Deltas"
+#define EVENTS "Events"
+
 #define MSG_HEARTBEAT 0
 #define MSG_DESCRIPTOR 1
 #define MSG_DATA 2
-
-char packetBuffer[UDP_TX_PACKET_MAX_SIZE]; //buffer to hold incoming packet,
-char ReplyBuffer[] = "acknowledged\r\n";   // a string to send back
 
 UCR::UCR(const char *ssid, const char *password)
 {
@@ -88,47 +90,69 @@ void UCR::name(const char *name)
 
 void UCR::addButton(const char *name, int index)
 {
-    if (index >= BUTTON_COUNT)
-        return;
+    if (index >= BUTTON_COUNT) return;
     _buttonList[index] = name;
 }
 
 void UCR::addAxis(const char *name, int index)
 {
-    if (index >= AXIS_COUNT)
-        return;
+    if (index >= AXIS_COUNT) return;
     _axisList[index] = name;
 }
 
 void UCR::addDelta(const char *name, int index)
 {
-    if (index >= DELTA_COUNT)
-        return;
+    if (index >= DELTA_COUNT) return;
     _deltaList[index] = name;
 }
 
 void UCR::addEvent(const char *name, int index)
 {
-    if (index >= EVENT_COUNT)
-        return;
+    if (index >= EVENT_COUNT) return;
     _eventList[index] = name;
+}
+
+bool UCR::readButton(int index){
+    if (index >= BUTTON_COUNT) return 0;
+    return buttonData[index];
+}
+
+short UCR::readAxis(int index){
+    if (index >= AXIS_COUNT) return 0;
+    return axisData[index];
+}
+
+short UCR::readDelta(int index){
+    if (index >= DELTA_COUNT) return 0;
+    return deltaData[index];
+}
+
+bool UCR::readEvent(int index){
+    if (index >= EVENT_COUNT) return 0;
+    return eventData[index];
 }
 
 bool UCR::update()
 {
     bool updated = false;
-    // TODO Reset Events
+    memset(eventData, 0, sizeof(eventData));
+    memset(deltaData, 0, sizeof(deltaData));
 
     MDNS.update();
-    if (receiveUdp())
+    if (!receiveUdp())
     {
-        _lastUpdateMillis = millis();
-        updated = true;
+        return false;
     }
 
-    // TODO update data structs
+    _lastUpdateMillis = millis();
+    return true;
+}
 
-    return updated;
+void UCR::resetValues(){
+    memset(buttonData, 0, sizeof(buttonData));
+    memset(axisData, 0, sizeof(axisData));
+    memset(deltaData, 0, sizeof(deltaData));
+    memset(eventData, 0, sizeof(eventData));
 }
 
 void addDescriptorList(JsonDocument *doc, const char *name, const char **list, int size)
@@ -151,7 +175,7 @@ bool UCR::receiveUdp()
     if (packetSize)
     {
 
-        int len = Udp.read(incomingPacketBuffer, 255);
+        int len = Udp.read(incomingPacketBuffer, sizeof(incomingPacketBuffer));
         if (len > 0)
         {
             incomingPacketBuffer[len] = 0;
@@ -179,25 +203,36 @@ bool UCR::receiveUdp()
         StaticJsonDocument<500> response;
         response["MsgType"] = msgType;
 
-        if (msgType == 0)
+        if (msgType == 1)
         {
-            Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
-            Udp.write("ACK");
-            Udp.endPacket();
-        }
-        else if (msgType == 1)
-        {
-            addDescriptorList(&response, "Buttons", _buttonList, BUTTON_COUNT);
-            addDescriptorList(&response, "Axes", _axisList, AXIS_COUNT);
-            addDescriptorList(&response, "Deltas", _deltaList, DELTA_COUNT);
-            addDescriptorList(&response, "Events", _eventList, EVENT_COUNT);
+            addDescriptorList(&response, BUTTONS, _buttonList, BUTTON_COUNT);
+            addDescriptorList(&response, AXES, _axisList, AXIS_COUNT);
+            addDescriptorList(&response, DELTAS, _deltaList, DELTA_COUNT);
+            addDescriptorList(&response, EVENTS, _eventList, EVENT_COUNT);
 
             serializeJsonPretty(response, Serial);
             Serial.println();
-            Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
-            serializeMsgPack(response, Udp);
-            Udp.endPacket();
         }
+
+        if (msgType == 2)
+        {
+            for(JsonObject o : request[BUTTONS].as<JsonArray>()){
+                buttonData[o["Index"].as<int>()] = o["Value"].as<bool>();
+            }
+            for(JsonObject o : request[AXES].as<JsonArray>()){
+                axisData[o["Index"].as<int>()] = o["Value"].as<short>();
+            }
+            for(JsonObject o : request[DELTAS].as<JsonArray>()){
+                deltaData[o["Index"].as<int>()] = o["Value"].as<short>();
+            }
+            for(JsonObject o : request[EVENTS].as<JsonArray>()){
+                eventData[o["Index"].as<int>()] = o["Value"].as<bool>();
+            }
+        }
+
+        Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
+        serializeMsgPack(response, Udp);
+        Udp.endPacket();
 
         return true;
     }

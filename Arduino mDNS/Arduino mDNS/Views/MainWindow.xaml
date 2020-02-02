@@ -19,9 +19,10 @@
         <TextBlock Text="Actions" Style="{StaticResource MaterialDesignHeadline6TextBlock}" />
         <StackPanel Margin="0 8" Grid.Row="1" Grid.Column="0">
             <Button Content="Clear Agents" Click="Clear_OnClick" Margin="4"/>
-            <Button Content="Send UDP packet" Click="Send_OnClick" Margin="4"/>
             <Button Content="Send Heartbeat" Click="Heartbeat_OnClick" Margin="4"/>
             <Button Content="Request descriptor" Click="Descriptor_OnClick" Margin="4"/>
+            <Button Content="Send button press" Click="ButtonPress_OnClick" Margin="4"/>
+            <Button Content="Send button release" Click="ButtonRelease_OnClick" Margin="4"/>
         </StackPanel>
         <TextBlock Text="Agents" Style="{StaticResource MaterialDesignHeadline6TextBlock}" Grid.Row="0" Grid.Column="1" Margin="8 0"/>
         <ListView x:Name="AgentList" ItemsSource="{Binding Agents}" Grid.Row="1" Grid.Column="1" Margin="8">

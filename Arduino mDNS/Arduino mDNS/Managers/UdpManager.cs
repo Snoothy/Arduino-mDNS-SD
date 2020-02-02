@@ -15,7 +15,7 @@ namespace Arduino_mDNS.Managers
         {
         }
 
-        public string SendUdpPacket(ServiceAgent serviceAgent, MessageBase.MessageType messageType = MessageBase.MessageType.Heartbeat)
+        public string SendUdpPacket(ServiceAgent serviceAgent, object messageBase)
         {
             // Bind specific local port
             using var udpClient = new UdpClient(8090);
@@ -23,7 +23,7 @@ namespace Arduino_mDNS.Managers
 
             udpClient.Connect(serviceAgent.Ip, serviceAgent.Port);
 
-            var message = CreateMessagePackMessage(messageType);
+            var message = MessagePackSerializer.Serialize(messageBase);
             udpClient.Send(message, message.Length);
             Debug.WriteLine($"Sent UDP to {serviceAgent.FullName}");
             Debug.WriteLine(MessagePackSerializer.ConvertToJson(message));
@@ -32,7 +32,12 @@ namespace Arduino_mDNS.Managers
             try
             {
                 var response = udpClient.Receive(ref ipEndPoint);
-                var responseString = System.Text.Encoding.Default.GetString(response);
+                if (((MessageBase)messageBase).Type == MessageBase.MessageType.Descriptor)
+                {
+                    var descriptorMessage = MessagePackSerializer.Deserialize<DescriptorMessage>(response);
+                    var a = 1;
+                }
+                var responseString = Encoding.Default.GetString(response);
                 Debug.WriteLine($"Received UDP: {responseString}");
                 return responseString;
             }
@@ -42,21 +47,6 @@ namespace Arduino_mDNS.Managers
                 return "No response";
             }
             
-        }
-
-        private byte[] CreateMessagePackMessage(MessageBase.MessageType messageType)
-        {
-            switch (messageType)
-            {
-                case MessageBase.MessageType.Heartbeat:
-                    return MessagePackSerializer.Serialize(new HeartbeatMessage());
-                case MessageBase.MessageType.Descriptor:
-                    return MessagePackSerializer.Serialize(new DescriptorMessage());
-                case MessageBase.MessageType.Data:
-                    break;
-            }
-
-            return MessagePackSerializer.Serialize(new HeartbeatMessage());
         }
     }
 }

@@ -6,6 +6,8 @@
 #define STAPSK "TODO"
 #endif
 
+#define LED_BUILTIN 2
+
 const char *ssid = STASSID;
 const char *password = STAPSK;
 unsigned int localPort = 8080;
@@ -24,6 +26,8 @@ void setup()
 
   Serial.println("\r\nsetup()");
 
+  pinMode(LED_BUILTIN, OUTPUT);
+
   ucr.name("UCR-ExampleAgent");
   ucr.addButton("LED", 0);
   ucr.addAxis("Accelerator", 0);
@@ -36,6 +40,8 @@ void setup()
 void loop()
 {
   ucr.update();
+
+  digitalWrite(LED_BUILTIN, ucr.readButton(0) ? LOW : HIGH);
 
   if (millis() - ucr.lastUpdateMillis() <= deadmanTimeout)
   {

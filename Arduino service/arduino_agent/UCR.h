@@ -17,18 +17,18 @@ public:
   UCR(const char *ssid, const char *password, unsigned int port);
   void begin();
   bool update();
+  void resetValues();
   void name(const char *name);
 
   void addButton(const char *name, int index);
-
   void addAxis(const char *name, int index);
   void addDelta(const char *name, int index);
   void addEvent(const char *name, int index);
 
-  short readButton(int index);
+  bool readButton(int index);
   short readAxis(int index);
   short readDelta(int index);
-  short readEvent(int index);
+  bool readEvent(int index);
 
   unsigned long lastUpdateMillis();
 
@@ -50,6 +50,11 @@ private:
   const char *_axisList[AXIS_COUNT] = {0};
   const char *_deltaList[DELTA_COUNT] = {0};
   const char *_eventList[EVENT_COUNT] = {0};
+
+  bool buttonData[BUTTON_COUNT] = {0};
+  short axisData[AXIS_COUNT] = {0};
+  short deltaData[DELTA_COUNT] = {0};
+  bool eventData[EVENT_COUNT] = {0};
 
   char incomingPacketBuffer[255];
 };
