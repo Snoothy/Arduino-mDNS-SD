@@ -15,7 +15,8 @@ namespace Arduino_mDNS.Models
             Data = 2
         }
 
-        [Key(0)]
+        [Key("MsgType")]
         public MessageType Type { get; set; }
+
     }
 }

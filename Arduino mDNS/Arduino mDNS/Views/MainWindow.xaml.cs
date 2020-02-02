@@ -45,6 +45,13 @@ namespace Arduino_mDNS
             _viewModel.AddAgent(serviceagent);
         }
 
+        private void SendMessage(MessageBase.MessageType messageType)
+        {
+            if (SelectedAgent() == null) return;
+
+            _viewModel.SetResponse(UdpManager.SendUdpPacket(SelectedAgent(), messageType));
+        }
+
         private void Send_OnClick(object sender, RoutedEventArgs e)
         {
             if (SelectedAgent() == null) return;
@@ -61,6 +68,16 @@ namespace Arduino_mDNS
         private void Clear_OnClick(object sender, RoutedEventArgs e)
         {
             _viewModel.ClearAgentList();
+        }
+
+        private void Heartbeat_OnClick(object sender, RoutedEventArgs e)
+        {
+            SendMessage(MessageBase.MessageType.Heartbeat);
+        }
+
+        private void Descriptor_OnClick(object sender, RoutedEventArgs e)
+        {
+            SendMessage(MessageBase.MessageType.Descriptor);
         }
     }
 }

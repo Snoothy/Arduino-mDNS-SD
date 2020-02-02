@@ -15,16 +15,15 @@ namespace Arduino_mDNS.Managers
         {
         }
 
-        public string SendUdpPacket(ServiceAgent serviceAgent)
+        public string SendUdpPacket(ServiceAgent serviceAgent, MessageBase.MessageType messageType = MessageBase.MessageType.Heartbeat)
         {
             // Bind specific local port
             using var udpClient = new UdpClient(8090);
-            udpClient.Client.ReceiveTimeout = 100;
+            udpClient.Client.ReceiveTimeout = 200;
 
             udpClient.Connect(serviceAgent.Ip, serviceAgent.Port);
 
-            //var sendBytes = Encoding.ASCII.GetBytes("Is anybody there?");
-            var message = CreateMessagePackMessage();
+            var message = CreateMessagePackMessage(messageType);
             udpClient.Send(message, message.Length);
             Debug.WriteLine($"Sent UDP to {serviceAgent.FullName}");
             Debug.WriteLine(MessagePackSerializer.ConvertToJson(message));
@@ -45,14 +44,19 @@ namespace Arduino_mDNS.Managers
             
         }
 
-        private byte[] CreateMessagePackMessage()
+        private byte[] CreateMessagePackMessage(MessageBase.MessageType messageType)
         {
-            var message = new MessageBase()
+            switch (messageType)
             {
-                Type = MessageBase.MessageType.Heartbeat
-            };
+                case MessageBase.MessageType.Heartbeat:
+                    return MessagePackSerializer.Serialize(new HeartbeatMessage());
+                case MessageBase.MessageType.Descriptor:
+                    return MessagePackSerializer.Serialize(new DescriptorMessage());
+                case MessageBase.MessageType.Data:
+                    break;
+            }
 
-            return MessagePackSerializer.Serialize(message);
+            return MessagePackSerializer.Serialize(new HeartbeatMessage());
         }
     }
 }
