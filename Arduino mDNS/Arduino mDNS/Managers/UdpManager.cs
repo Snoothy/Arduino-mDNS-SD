@@ -18,8 +18,10 @@ namespace Arduino_mDNS.Managers
         public string SendUdpPacket(ServiceAgent serviceAgent, object messageBase)
         {
             // Bind specific local port
-            using var udpClient = new UdpClient(8090);
-            udpClient.Client.ReceiveTimeout = 200;
+            using var udpClient = new UdpClient(8090)
+            {
+                Client = {ReceiveTimeout = 200}
+            };
 
             udpClient.Connect(serviceAgent.Ip, serviceAgent.Port);
 
